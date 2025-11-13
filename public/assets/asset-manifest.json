@@ -1,6 +1,9 @@
 {
   "food-trough": {
-    "food trough": "/assets/food-trough/food trough.jpg"
+    "level-1": "/assets/food-trough/food trough.jpg",
+    "level-2": "/assets/food-trough/food trough.jpg",
+    "level-3": "/assets/food-trough/food trough.jpg",
+    "level-4": "/assets/food-trough/food trough.jpg"
   },
   "horses": {
     "cute horse (32)": "/assets/horses/cute horse (32).png",
@@ -36,7 +39,9 @@
     "water-splash": "/assets/sounds/water-splash-02-352021.mp3"
   },
   "water-trough": {
-    "stone water trough": "/assets/water-trough/stone water trough.jpg",
-    "wooden water trough": "/assets/water-trough/wooden water trough.jpg"
+    "level-1": "/assets/water-trough/wooden water trough.jpg",
+    "level-2": "/assets/water-trough/stone water trough.jpg",
+    "level-3": "/assets/water-trough/stone water trough.jpg",
+    "level-4": "/assets/water-trough/stone water trough.jpg"
   }
 }

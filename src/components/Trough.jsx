@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { useSound } from '../context/SoundContext'
 import { useAssets } from '../context/AssetContext'
 
-export default function Trough({label, level, onFill, type}){
+export default function Trough({label, level, onFill, type, upgradeLevel}){
   const resolvedType = type || String(label || '').toLowerCase()
   const pct = Math.max(0, Math.min(1, level)) * 100
   const [pressed, setPressed] = useState(false)
@@ -13,12 +13,13 @@ export default function Trough({label, level, onFill, type}){
   const { playChime, playNamedSound } = useSound()
   const { get } = useAssets()
 
-  // Get trough image
+  // Get trough image based on upgrade level
   let troughImg = null
+  const imgLevel = upgradeLevel || 1
   if(resolvedType === 'food' || resolvedType === 'feed'){
-    troughImg = get('food-trough', 'food trough')
+    troughImg = get('food-trough', `level-${imgLevel}`)
   } else if(resolvedType === 'water'){
-    troughImg = get('water-trough', 'wooden water trough')
+    troughImg = get('water-trough', `level-${imgLevel}`)
   }
 
   function handleClick(){
@@ -62,7 +63,7 @@ export default function Trough({label, level, onFill, type}){
 
   return (
     <motion.div
-      className="relative w-24 bg-white p-2 rounded shadow-sm border cursor-pointer overflow-hidden"
+      className="relative w-24 p-2 rounded shadow-sm border cursor-pointer overflow-hidden"
       onClick={handleClick}
       whileTap={{ scale: 0.96 }}
       animate={pressed ? { scale: 1.04 } : { scale: 1 }}
@@ -70,52 +71,55 @@ export default function Trough({label, level, onFill, type}){
       role="button"
       tabIndex={0}
       onKeyDown={(e)=> { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick() } }}
+      style={{
+        backgroundImage: troughImg ? `url(${troughImg})` : 'none',
+        backgroundSize: 'contain',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center top',
+        backgroundColor: 'white'
+      }}
     >
-      {/* Trough Image */}
-      {troughImg && (
-        <div className="mb-1 flex justify-center">
-          <img src={troughImg} alt={`${resolvedType}-trough`} className="h-12 object-contain" />
+      {/* Content overlay */}
+      <div className="relative z-10">
+        <div className="text-xs text-gray-600 mb-12 flex items-center justify-between">
+          <div className="text-[11px] font-semibold">{label}</div>
+          <div className={`text-[10px] px-1.5 py-0.5 rounded ${badgeClass}`}>{status}</div>
         </div>
-      )}
-      
-      <div className="text-xs text-gray-600 mb-1 flex items-center justify-between">
-        <div className="text-[11px]">{label}</div>
-        <div className={`text-[10px] px-1.5 py-0.5 rounded ${badgeClass}`}>{status}</div>
-      </div>
-      <div className="w-full h-8 bg-gray-200 rounded overflow-hidden flex items-end relative border border-gray-300">
-        <motion.div
-          className={`w-full ${barClass}`}
-          style={{height: `${pct}%`}}
-          animate={{ height: `${pct}%` }}
-          transition={{ ease: 'easeInOut', duration: 0.35 }}
-        />
-        {showFull && (
-          <div className="absolute inset-0 flex items-start justify-center pointer-events-none">
-            <div className="relative w-full h-full">
-              {/* simple confetti circles */}
-              {confetti.map((f, i)=> (
-                <motion.span key={i}
-                  initial={{ opacity: 0, y: 0, scale: 0.6 }}
-                  animate={{ opacity: 1, y: -18 - (i*6), scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.6, ease: 'easeOut' }}
-                  style={{ left: f.x, top: f.y, background: f.c }}
-                  className="absolute rounded-full w-2.5 h-2.5"
-                
-                  >
-                  </motion.span>
-              ))}
-              {/* glow pulse */}
-              <motion.div
-                className="absolute inset-0 rounded"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.12, scale: [0.98,1.02,1] }}
-                transition={{ duration: 0.9 }}
-                style={{ background: resolvedType === 'food' ? 'radial-gradient(circle at 50% 20%, rgba(245,158,11,0.14), transparent 40%)' : 'radial-gradient(circle at 50% 20%, rgba(59,130,246,0.12), transparent 40%)' }}
-              />
+        <div className="w-full h-8 bg-gray-200 rounded overflow-hidden flex items-end relative border border-gray-300">
+          <motion.div
+            className={`w-full ${barClass}`}
+            style={{height: `${pct}%`}}
+            animate={{ height: `${pct}%` }}
+            transition={{ ease: 'easeInOut', duration: 0.35 }}
+          />
+          {showFull && (
+            <div className="absolute inset-0 flex items-start justify-center pointer-events-none">
+              <div className="relative w-full h-full">
+                {/* simple confetti circles */}
+                {confetti.map((f, i)=> (
+                  <motion.span key={i}
+                    initial={{ opacity: 0, y: 0, scale: 0.6 }}
+                    animate={{ opacity: 1, y: -18 - (i*6), scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.6, ease: 'easeOut' }}
+                    style={{ left: f.x, top: f.y, background: f.c }}
+                    className="absolute rounded-full w-2.5 h-2.5"
+                  
+                    >
+                    </motion.span>
+                ))}
+                {/* glow pulse */}
+                <motion.div
+                  className="absolute inset-0 rounded"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 0.12, scale: [0.98,1.02,1] }}
+                  transition={{ duration: 0.9 }}
+                  style={{ background: resolvedType === 'food' ? 'radial-gradient(circle at 50% 20%, rgba(245,158,11,0.14), transparent 40%)' : 'radial-gradient(circle at 50% 20%, rgba(59,130,246,0.12), transparent 40%)' }}
+                />
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </motion.div>
   )
