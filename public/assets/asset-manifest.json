@@ -1,0 +1,42 @@
+{
+  "food-trough": {
+    "food trough": "/assets/food-trough/food trough.jpg"
+  },
+  "horses": {
+    "cute horse (32)": "/assets/horses/cute horse (32).png",
+    "cute horse (33)": "/assets/horses/cute horse (33).png",
+    "cute horse (34)": "/assets/horses/cute horse (34).jpg",
+    "cute horse (35)": "/assets/horses/cute horse (35).jpg",
+    "cute horse (36)": "/assets/horses/cute horse (36).jpg",
+    "cute_horse (1)": "/assets/horses/cute_horse (1).png",
+    "cute_horse (10)": "/assets/horses/cute_horse (10).png",
+    "cute_horse (11)": "/assets/horses/cute_horse (11).png",
+    "cute_horse (12)": "/assets/horses/cute_horse (12).png",
+    "cute_horse (13)": "/assets/horses/cute_horse (13).png",
+    "cute_horse (2)": "/assets/horses/cute_horse (2).png",
+    "cute_horse (3)": "/assets/horses/cute_horse (3).png",
+    "cute_horse (4)": "/assets/horses/cute_horse (4).png",
+    "cute_horse (5)": "/assets/horses/cute_horse (5).png",
+    "cute_horse (6)": "/assets/horses/cute_horse (6).png",
+    "cute_horse (7)": "/assets/horses/cute_horse (7).png",
+    "cute_horse (8)": "/assets/horses/cute_horse (8).png",
+    "cute_horse (9)": "/assets/horses/cute_horse (9).png"
+  },
+  "houses": {
+    "house (1)": "/assets/houses/house (1).jpg",
+    "house (2)": "/assets/houses/house (2).jpg",
+    "house (3)": "/assets/houses/house (3).jpg",
+    "house (4)": "/assets/houses/house (4).jpg"
+  },
+  "sounds": {
+    "feed": "/assets/sounds/chewing-112931.mp3",
+    "eating": "/assets/sounds/eating-sounds-265089.mp3",
+    "aegyo": "/assets/sounds/snap_your_fingers-421499.mp3",
+    "water-fill": "/assets/sounds/water-drop-85731.mp3",
+    "water-splash": "/assets/sounds/water-splash-02-352021.mp3"
+  },
+  "water-trough": {
+    "stone water trough": "/assets/water-trough/stone water trough.jpg",
+    "wooden water trough": "/assets/water-trough/wooden water trough.jpg"
+  }
+}

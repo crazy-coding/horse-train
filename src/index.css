@@ -1,0 +1,24 @@
+/* Custom local styles (kept minimal — Tailwind handles main layout) */
+:root{
+  --bg:#f0f7fb;
+  --card:#ffffff;
+  --accent:#6c5ce7;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Arial,Helvetica,sans-serif;background:var(--bg);color:#222}
+.app-root{max-width:920px;margin:24px auto;padding:16px}
+.app-header h1{margin:0 0 6px}
+.play-area{display:flex;flex-direction:column;gap:12px}
+.house-wrapper{position:relative;background:var(--card);padding:16px;border-radius:12px;box-shadow:0 6px 20px rgba(20,20,40,0.06)}
+.horse-area{position:absolute;left:28px;bottom:8px}
+.controls{margin-top:12px;display:flex;gap:8px}
+button{padding:8px 12px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);background:var(--accent);color:white;cursor:pointer}
+.horse{width:180px}
+.horse-meta{font-size:12px;margin-top:6px}
+.horse-badge{background:#fff4;display:inline-block;padding:4px;border-radius:6px}
+.house{height:160px;border-radius:8px;padding:12px;background:linear-gradient(180deg,#fff,#f7fbff);display:flex;justify-content:space-between;align-items:flex-end}
+.house-body{font-weight:600}
+.house-troughs{display:flex;gap:12px}
+.trough{width:84px;background:#fff;padding:6px;border-radius:8px;border:1px solid #eee}
+.trough-body{height:64px;background:#f3f6f9;border-radius:6px;overflow:hidden;display:flex;align-items:flex-end}
+.trough-fill{width:100%;background:#4da6ff;transition:height 320ms ease}
