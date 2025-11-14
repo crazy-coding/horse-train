@@ -1,3 +1,282 @@
+<!-- Project README generated: full guide for 2D & 3D usage -->
+
+# Cute Horse Game — README
+
+This repository is a small demo/game showing a cute horse with a house and troughs. It supports both a 2D UI driven by Framer Motion and an optional 3D view powered by React Three Fiber (Three.js). This README covers getting started, development, 2D/3D usage, and how to swap in a GLB model with multiple animation clips.
+
+---
+
+## Table of contents
+
+- Getting started
+- Development (run / build)
+- Project layout
+- 2D (framer-motion) usage
+- 3D (react-three-fiber) usage
+- Using a GLB model (exporting from Blender and wiring it up)
+- Animation state contract
+- Troubleshooting
+- Contributing
+- License
+
+---
+
+## Getting started
+
+Prerequisites:
+- Node.js (16+ recommended)
+- npm (comes with Node)
+
+Install dependencies (Windows PowerShell):
+
+```powershell
+cd C:\Users\Administrator\Downloads\next-download\horse-train
+npm install
+# If you encounter dependency resolution issues for @react-three/fiber, use:
+# npm install three @react-three/fiber@8.17.0 @react-three/drei --legacy-peer-deps
+```
+
+Notes:
+- During development `@react-three/fiber@8.17.0` was used to avoid React 19 peer dependency restrictions.
+- If you add a GLB file later you do not need to re-install these packages unless you add new packages.
+
+---
+
+## Development: run & build
+
+Start the dev server (PowerShell):
+
+```powershell
+npm run dev
+```
+
+Open the app in your browser (Vite will show the local URL). On my machine it was accessible at `http://localhost:5173` by default.
+
+Build for production:
+
+```powershell
+npm run build
+npm run preview
+```
+
+---
+
+## Project layout (relevant files)
+
+```
+/ (repo root)
+  README.md                    # This file
+  public/
+    assets/
+      horses/                  # 2D horse assets
+      houses/                  # house images
+      horse-model/             # place GLB here when using a 3D model
+
+  src/
+    App.jsx                    # main app + 2D/3D toggle
+    main.jsx
+    index.css
+    components/
+      Horse.jsx                # 2D horse (framer-motion) and fallback
+      HorseBody.jsx
+      HorseHead.jsx
+      HorseEyes.jsx
+      Horse3D.jsx               # 3D procedural horse + useFrame animations
+      HorseCanvas.jsx           # Canvas wrapper for Three.js
+      Horse3DGLBTemplate.jsx    # Template that shows how to load/drive a GLB model
+      CarrotAnimation.jsx       # animated carrot particle
+      House.jsx
+      Trough.jsx
+      Shop.jsx
+    context/
+      AssetContext.jsx
+      SoundContext.jsx
+
+  scripts/
+    generate-asset-manifest.js
+```
+
+---
+
+## 2D vs 3D usage
+
+The UI supports both 2D and 3D. Click the **3D Mode** button in the header to toggle.
+
+2D mode (default):
+- Uses `Horse.jsx` with Framer Motion variants for expressions and gestures.
+- Buttons in the HUD call functions like `makeEat()`, `makeAegyo()` that set `horse.animation` in app state. Those values drive the Framer Motion `animate` prop.
+
+3D mode:
+- Uses `HorseCanvas.jsx` which renders a Three.js `Canvas` and `Horse3D.jsx`.
+- `Horse3D.jsx` currently includes a procedural horse (built from geometries) with independent parts (body/head/eyes/tail) animated inside `useFrame()`.
+- Animations are triggered by the same `horse.animation` prop — the 3D component reads that prop and applies transforms.
+
+You can keep the 2D assets and still use 3D; the code is written to be backward compatible.
+
+---
+
+## Animation state contract
+
+The app uses a small animation contract so both 2D and 3D systems understand the requested action. The animation string values are:
+
+- `idle`
+- `eat`
+- `blink`
+- `headTilt`
+- `closeEyes`
+- `hungry` (looping)
+- `hurt`
+- `cute`
+- `brushed`
+- `aegyo`
+
+Behavior expectations:
+- Non-looping animations should revert to `idle` after their duration.
+- `hungry` is intended to loop until changed.
+- Button handlers in `App.jsx` set the animation string and optionally play a sound via `useSound()`.
+
+Duration reference (used by UI to reset animation):
+
+```js
+const durations = {
+  idle: 0.3,
+  eat: 0.8,
+  blink: 0.4,
+  headTilt: 1.0,
+  closeEyes: 1.2,
+  hungry: 1.5,
+  hurt: 0.6,
+  cute: 1.0,
+  brushed: 0.9,
+  aegyo: 0.9,
+}
+```
+
+When you add a GLB model, make sure the clip names match these strings or map them inside `Horse3D.jsx` when using `useAnimations()`.
+
+---
+
+## Using a GLB model (Blender → GLB → useAnimations)
+
+If you want a professionally rigged horse with skeletal animations, follow these steps.
+
+1) Create/prepare animation clips in Blender
+
+- Rig the horse with an armature (bones). Skin the mesh.
+- For each action (e.g. `eat`) create a separate Action in the Action Editor.
+- Keep action names matching the above strings. Consistent naming is important.
+- Make sure to store actions as NLA tracks or keep them in the Action Editor (so they are exported).
+
+2) Export the GLB
+
+File → Export → glTF 2.0 (.glb)
+- Format: GLB (binary) recommended
+- Include: Mesh, Armature, Animations
+- Under "Animation" options, export all actions. Consider grouping or naming via NLA for clarity.
+
+3) Put the file into the public folder
+
+Create folder `public/assets/horse-model/` and copy your `horse.glb` there.
+
+4) Wire up `Horse3D.jsx` to use the GLB
+
+A template is provided in `src/components/Horse3DGLBTemplate.jsx`.
+
+Key steps inside the component:
+
+```js
+const { scene: modelScene, animations } = useGLTF('/assets/horse-model/horse.glb')
+const { actions } = useAnimations(animations, groupRef)
+
+useEffect(() => {
+  if (!actions) return
+  // stop/blend out existing actions then play the requested one
+  Object.values(actions).forEach(a => a?.stop())
+  actions[animation]?.reset()?.fadeIn(0.2)?.play()
+}, [animation, actions])
+```
+
+Notes:
+- Use `console.log(Object.keys(actions))` to inspect available clip names.
+- Clip names in the GLB must match your `horse.animation` strings, or provide a name mapping inside `Horse3D.jsx`.
+- `useAnimations` returns clips keyed by name — you can crossfade using `.fadeOut()` and `.fadeIn()`.
+
+---
+
+## Development tips and debugging
+
+Common quick checks:
+
+- Dev server not starting / port in use: Vite will try the next port. Check terminal output for the local URL (usually http://localhost:5173 or 5174).
+- NPM peer dependency errors installing react-three packages: use the `--legacy-peer-deps` flag (see the install snippet above).
+- GLB model not loading: verify the path is correct (`/assets/horse-model/horse.glb`) and the file is inside `public` (not `src`). Check browser network tab and console errors.
+- Animation clips not found: open the console and `console.log(Object.keys(actions))` inside the GLB loader.
+
+Powerful debugging patterns:
+
+- Temporarily show available animations and their lengths from `useAnimations`.
+- For GLB, open the model in Blender and make sure the actions are exported and have unique names.
+- If the model looks deformed, ensure transforms are applied (`Ctrl-A`) before export and that scale/rotation are baked.
+
+---
+
+## How to extend / add new animations
+
+1. Add a new action name to the contract (both `App.jsx` and `Horse3D.jsx`).
+2. For 2D: add a Framer Motion variant in `Horse.jsx` and a button handler in `App.jsx`.
+3. For 3D: add a new clip in Blender with the exact name or map inside `Horse3D.jsx`.
+4. Provide a sensible duration in the `durations` object so UI can reset to idle.
+
+---
+
+## Troubleshooting & FAQ
+
+Q: "3D Mode" button doesn’t appear
+- Ensure your `src/components/HorseCanvas.jsx` exists and `App.jsx` imports it.
+
+Q: GLB animations not playing
+- Run `console.log(Object.keys(actions))` inside the GLB loader to inspect available clip names.
+- Map your `horse.animation` to the clip names if they differ.
+
+Q: Development server shows HMR updates but the 3D canvas is blank
+- Check the browser console for WebGL errors.
+- Ensure `three` package is installed, and the correct version of `@react-three/fiber` is used.
+
+Q: I see artifacts or odd mesh deformations after loading GLB
+- In Blender, apply transforms (Ctrl-A) and ensure you export with "Apply Modifiers" if needed.
+- Check bone weights and ensure the mesh is skinned correctly.
+
+---
+
+## Contributing
+
+Contributions are welcome. Suggested workflow:
+
+```powershell
+# create branch
+git checkout -b feat/3d-horse-improvements
+# make changes
+git add .
+git commit -m "Improve Horse3D animation and GLB loader"
+git push
+```
+
+Please open a pull request and describe the change. Add screenshots and the browser console output if related to rendering.
+
+---
+
+## License
+
+This demo project is provided under the MIT license. See `LICENSE` if provided or add one if you plan to publish.
+
+---
+
+If you want, I can:
+- Run through converting `Horse3D.jsx` fully to GLB-based `useGLTF` usage and swap out the procedural geometry for a real model (I can implement the code once you add your `horse.glb`).
+- Add sample GLB (low-poly) to `public/assets/horse-model/` to demonstrate exact wiring and clip names.
+
+If you'd like me to write `README.md` to a different format or add example screenshots, tell me where and I'll add them.
+
 <!-- Keep the existing README intentionally; a small demo scaffolding has been added alongside it. -->
 // CuteHorseGame - Single-file example + implementation plan
 // Language: English

@@ -4,6 +4,7 @@ import Horse from './components/Horse'
 import House from './components/House'
 import Shop from './components/Shop'
 import CarrotAnimation from './components/CarrotAnimation'
+import HorseCanvas from './components/HorseCanvas'
 
 export default function App(){
   const [horse, setHorse] = useState({
@@ -15,6 +16,9 @@ export default function App(){
   })
 
   const [carrotAnimating, setCarrotAnimating] = useState(false)
+
+  const [use3D, setUse3D] = useState(false)
+  const [showBoth, setShowBoth] = useState(false)
 
   const [coins, setCoins] = useState(100)
   const [gems, setGems] = useState(50)
@@ -332,39 +336,93 @@ export default function App(){
           <button onClick={toggleMute} className="px-3 py-1 bg-gray-100 rounded text-sm hover:bg-gray-200">
             {muted ? 'Unmute' : 'Mute'}
           </button>
+          <button 
+            onClick={() => setUse3D(!use3D)} 
+            className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
+          >
+            {use3D ? '2D Mode' : '3D Mode'}
+          </button>
+          <button 
+            onClick={() => setShowBoth(s => !s)}
+            className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600"
+          >
+            {showBoth ? 'Hide Both' : 'Show Both'}
+          </button>
         </div>
       </header>
 
       <main className="space-y-4">
-        <div className="relative bg-white rounded-xl shadow-lg overflow-hidden">
-          <House
-            styleId={house.styleId}
-            mode={house.mode}
-            foodLevel={house.foodLevel}
-            waterLevel={house.waterLevel}
-            foodTroughLevel={upgrades.foodTroughLevel}
-            waterTroughLevel={upgrades.waterTroughLevel}
-            cornCount={house.cornCount}
-            carrotCount={house.carrotCount}
-            onToggleFoodType={toggleTroughFoodType}
-            onFillFeed={() => {
-              const fillAmount = 0.3 * upgrades.foodTroughLevel
-              const newLevel = Math.min(1, house.foodLevel + fillAmount)
-              setHouse(hs => ({...hs, foodLevel: newLevel}))
-              playNamedSound('feed')
-            }}
-            onFillWater={() => {
-              const fillAmount = 0.3 * upgrades.waterTroughLevel
-              const newLevel = Math.min(1, house.waterLevel + fillAmount)
-              setHouse(hs => ({...hs, waterLevel: newLevel}))
-              playNamedSound('water-fill')
-            }}
-          />
-          {/* Horse positioned in front of house */}
-          <div className="absolute left-8 bottom-0 z-20">
-            <Horse horse={horse} />
+        {showBoth ? (
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden" style={{ height: '600px' }}>
+              <h3 className="p-2 font-semibold">3D Horse</h3>
+              <HorseCanvas animation={horse.animation} />
+            </div>
+            <div className="relative bg-white rounded-xl shadow-lg overflow-hidden p-4" style={{ height: '600px' }}>
+              <h3 className="p-2 font-semibold">2D Horse + House</h3>
+              <House
+                styleId={house.styleId}
+                mode={house.mode}
+                foodLevel={house.foodLevel}
+                waterLevel={house.waterLevel}
+                foodTroughLevel={upgrades.foodTroughLevel}
+                waterTroughLevel={upgrades.waterTroughLevel}
+                cornCount={house.cornCount}
+                carrotCount={house.carrotCount}
+                onToggleFoodType={toggleTroughFoodType}
+                onFillFeed={() => {
+                  const fillAmount = 0.3 * upgrades.foodTroughLevel
+                  const newLevel = Math.min(1, house.foodLevel + fillAmount)
+                  setHouse(hs => ({...hs, foodLevel: newLevel}))
+                  playNamedSound('feed')
+                }}
+                onFillWater={() => {
+                  const fillAmount = 0.3 * upgrades.waterTroughLevel
+                  const newLevel = Math.min(1, house.waterLevel + fillAmount)
+                  setHouse(hs => ({...hs, waterLevel: newLevel}))
+                  playNamedSound('water-fill')
+                }}
+              />
+              <div className="absolute left-8 bottom-0 z-20">
+                <Horse horse={horse} />
+              </div>
+            </div>
           </div>
-        </div>
+        ) : use3D ? (
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden" style={{ height: '600px' }}>
+            <HorseCanvas animation={horse.animation} />
+          </div>
+        ) : (
+          <div className="relative bg-white rounded-xl shadow-lg overflow-hidden">
+            <House
+              styleId={house.styleId}
+              mode={house.mode}
+              foodLevel={house.foodLevel}
+              waterLevel={house.waterLevel}
+              foodTroughLevel={upgrades.foodTroughLevel}
+              waterTroughLevel={upgrades.waterTroughLevel}
+              cornCount={house.cornCount}
+              carrotCount={house.carrotCount}
+              onToggleFoodType={toggleTroughFoodType}
+              onFillFeed={() => {
+                const fillAmount = 0.3 * upgrades.foodTroughLevel
+                const newLevel = Math.min(1, house.foodLevel + fillAmount)
+                setHouse(hs => ({...hs, foodLevel: newLevel}))
+                playNamedSound('feed')
+              }}
+              onFillWater={() => {
+                const fillAmount = 0.3 * upgrades.waterTroughLevel
+                const newLevel = Math.min(1, house.waterLevel + fillAmount)
+                setHouse(hs => ({...hs, waterLevel: newLevel}))
+                playNamedSound('water-fill')
+              }}
+            />
+            {/* Horse positioned in front of house */}
+            <div className="absolute left-8 bottom-0 z-20">
+              <Horse horse={horse} />
+            </div>
+          </div>
+        )}
 
         <div className="flex gap-3 flex-wrap">
           <button 
