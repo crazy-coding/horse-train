@@ -283,6 +283,32 @@ export default function App(){
     setTimeout(()=> setHorse(h => ({...h, animation:'idle'})), 1000)
   }
 
+  // Animation helper function
+  const triggerAnimation = (animationType, duration = 1000, soundName = null) => {
+    setHorse(h => ({...h, animation: animationType}))
+    if (soundName) {
+      try {
+        playNamedSound(soundName)
+      } catch (e) {
+        // Silent fail if sound not available
+      }
+    }
+    setTimeout(() => setHorse(h => ({...h, animation: 'idle'})), duration)
+  }
+
+  // Animation trigger functions
+  const makeEat = () => triggerAnimation('eat', 800, 'eating')
+  const makeBlink = () => triggerAnimation('blink', 400)
+  const makeHeadTilt = () => triggerAnimation('headTilt', 1000)
+  const makeCloseEyes = () => triggerAnimation('closeEyes', 1200)
+  const makeHungry = () => {
+    setHorse(h => ({...h, animation: 'hungry'}))
+    setTimeout(() => setHorse(h => ({...h, animation: 'idle'})), 3000)
+  }
+  const makeHurt = () => triggerAnimation('hurt', 600)
+  const makeCute = () => triggerAnimation('cute', 1000, 'aegyo')
+  const makeBrushed = () => triggerAnimation('brushed', 900, 'feed')
+
   const { muted, toggleMute } = useSound()
 
   return (
@@ -359,7 +385,60 @@ export default function App(){
         </div>
 
         <div className="bg-white p-4 rounded-lg shadow">
-          <h3 className="font-bold mb-3 text-sm">🛒 Buy Food</h3>
+          <h3 className="font-bold mb-3 text-sm">🎬 Horse Animations</h3>
+          <div className="grid grid-cols-4 gap-2">
+            <button
+              onClick={makeEat}
+              className="px-3 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition font-medium"
+            >
+              🍽️ Eat
+            </button>
+            <button
+              onClick={makeBlink}
+              className="px-3 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition font-medium"
+            >
+              👁️ Blink
+            </button>
+            <button
+              onClick={makeHeadTilt}
+              className="px-3 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition font-medium"
+            >
+              🤔 Head Tilt
+            </button>
+            <button
+              onClick={makeCloseEyes}
+              className="px-3 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition font-medium"
+            >
+              😴 Close Eyes
+            </button>
+            <button
+              onClick={makeHungry}
+              className="px-3 py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition font-medium"
+            >
+              😫 Hungry
+            </button>
+            <button
+              onClick={makeHurt}
+              className="px-3 py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition font-medium"
+            >
+              😢 Hurt
+            </button>
+            <button
+              onClick={makeCute}
+              className="px-3 py-2 bg-purple-500 text-white text-sm rounded hover:bg-purple-600 transition font-medium"
+            >
+              ✨ Cute
+            </button>
+            <button
+              onClick={makeBrushed}
+              className="px-3 py-2 bg-indigo-500 text-white text-sm rounded hover:bg-indigo-600 transition font-medium"
+            >
+              💇 Brushed
+            </button>
+          </div>
+        </div>
+
+        <div className="bg-white p-4 rounded-lg shadow">
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => buyFood('corn', 5)}
