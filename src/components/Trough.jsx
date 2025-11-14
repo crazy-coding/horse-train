@@ -3,9 +3,22 @@ import { motion } from 'framer-motion'
 import { useSound } from '../context/SoundContext'
 import { useAssets } from '../context/AssetContext'
 
-export default function Trough({label, level, onFill, type, upgradeLevel}){
+export default function Trough({label, level, onFill, type, upgradeLevel, foodType, carrotCount, cornCount, onToggleFoodType}){
   const resolvedType = type || String(label || '').toLowerCase()
-  const pct = Math.max(0, Math.min(1, level)) * 100
+  
+  // For food trough: calculate fill percentage based on food count
+  let pct = 0
+  if((resolvedType === 'food' || resolvedType === 'feed') && (cornCount !== undefined || carrotCount !== undefined)){
+    // Get trough capacity based on upgrade level
+    const capacities = [5, 10, 20, 35]
+    const capacity = capacities[upgradeLevel - 1] || 5
+    const totalFood = (cornCount || 0) + (carrotCount || 0)
+    pct = Math.max(0, Math.min(1, totalFood / capacity)) * 100
+  } else {
+    // For water trough: use level prop
+    pct = Math.max(0, Math.min(1, level)) * 100
+  }
+  
   const [pressed, setPressed] = useState(false)
   const [showFull, setShowFull] = useState(false)
   const prevLevel = useRef(level)
@@ -23,7 +36,12 @@ export default function Trough({label, level, onFill, type, upgradeLevel}){
   }
 
   function handleClick(){
-    if(typeof onFill === 'function') onFill()
+    // For food trough, toggle food type on click
+    if((resolvedType === 'food' || resolvedType === 'feed') && onToggleFoodType){
+      onToggleFoodType()
+    } else if(typeof onFill === 'function'){
+      onFill()
+    }
     // play fill sound
     playNamedSound(resolvedType === 'food' || resolvedType === 'feed' ? 'feed' : 'water-fill')
     setPressed(true)
@@ -82,7 +100,14 @@ export default function Trough({label, level, onFill, type, upgradeLevel}){
       {/* Content overlay */}
       <div className="relative z-10">
         <div className="text-xs text-gray-600 mb-12 flex items-center justify-between">
-          <div className="text-[11px] font-semibold">{label}</div>
+          <div className="text-[11px] font-semibold flex items-center gap-1">
+            {label}
+            {(resolvedType === 'food' || resolvedType === 'feed') && (
+              <span className="text-sm">
+                {cornCount || 0 > 0 ? `🌾${cornCount}` : ''} {carrotCount || 0 > 0 ? `🥕${carrotCount}` : ''}
+              </span>
+            )}
+          </div>
           <div className={`text-[10px] px-1.5 py-0.5 rounded ${badgeClass}`}>{status}</div>
         </div>
         <div className="w-full h-8 bg-gray-200 rounded overflow-hidden flex items-end relative border border-gray-300">

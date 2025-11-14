@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useAssets } from '../context/AssetContext'
 import { motion } from 'framer-motion'
 
 export default function Shop({ 
@@ -13,17 +14,36 @@ export default function Shop({
   canUpgradeTrough,
   performTroughUpgrade,
   getUpgradeCost,
+  getHousePrice,
   maxTroughLevel
 }){
   const [expanded, setExpanded] = useState(false)
   const [activeTab, setActiveTab] = useState('houses')
 
-  const houseStyles = [
-    { id: 1, name: 'Cozy Cottage', icon: '🏠' },
-    { id: 2, name: 'Modern Home', icon: '🏡' },
-    { id: 3, name: 'Grand Manor', icon: '🏰' },
-    { id: 4, name: 'Luxury Estate', icon: '👑' }
-  ]
+  // Build house styles from asset manifest when available so the shop reflects available assets
+  const { manifest } = useAssets()
+  let houseStyles = []
+  if(manifest && manifest.houses){
+    houseStyles = Object.keys(manifest.houses)
+      .map(key => {
+        // Expect keys like "house (1)" — extract the number
+        const m = key.match(/house \((\d+)\)/)
+        const id = m ? parseInt(m[1], 10) : null
+        return id ? { id, name: `House ${id}`, icon: '🏠' } : null
+      })
+      .filter(Boolean)
+      .sort((a,b) => a.id - b.id)
+  }
+
+  // Fallback static list if manifest isn't loaded yet
+  if(houseStyles.length === 0){
+    houseStyles = [
+      { id: 1, name: 'Cozy Cottage', icon: '🏠' },
+      { id: 2, name: 'Modern Home', icon: '🏡' },
+      { id: 3, name: 'Grand Manor', icon: '🏰' },
+      { id: 4, name: 'Luxury Estate', icon: '👑' }
+    ]
+  }
 
   const troughUpgrades = [
     {
@@ -99,7 +119,7 @@ export default function Shop({
               {houseStyles.map((house) => {
                 const owned = ownedHouses[house.id]
                 const isActive = currentHouseStyle === house.id
-                const cost = housePrices[house.id]
+                const cost = getHousePrice ? getHousePrice(house.id) : housePrices[house.id]
                 const canBuy = canBuyHouse(house.id)
 
                 return (
@@ -127,7 +147,7 @@ export default function Shop({
                                 <span className="text-green-600">✓ Owned</span>
                               )
                             ) : (
-                              <span>💰 {cost} coins</span>
+                              <span>💎 {cost} gems</span>
                             )}
                           </div>
                         </div>
@@ -147,7 +167,7 @@ export default function Shop({
                             Buy
                           </button>
                         )}
-                        {owned && !isActive && (
+                          {owned && !isActive && (
                           <button
                             onClick={() => switchHouse(house.id)}
                             className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded font-semibold transition"

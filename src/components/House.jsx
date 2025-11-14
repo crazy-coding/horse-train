@@ -2,7 +2,7 @@ import React from 'react'
 import Trough from './Trough'
 import { useAssets } from '../context/AssetContext'
 
-export default function House({styleId, mode, foodLevel, waterLevel, foodTroughLevel, waterTroughLevel, onFillFeed, onFillWater}){
+export default function House({styleId, mode, foodLevel, waterLevel, foodTroughLevel, waterTroughLevel, onFillFeed, onFillWater, cornCount, carrotCount, onToggleFoodType}){
   const { get } = useAssets()
   const houseImg = get('houses', `house (${styleId})`)
 
@@ -26,7 +26,7 @@ export default function House({styleId, mode, foodLevel, waterLevel, foodTroughL
             House #{String(styleId).padStart(2,'0')} <span className="text-xs text-gray-200">({mode})</span>
           </div>
           <div className="flex gap-3">
-            <Trough label={`Food ${foodTroughLevel}`} type="food" level={foodLevel} upgradeLevel={foodTroughLevel} onFill={onFillFeed} />
+            <Trough label={`Food ${foodTroughLevel}`} type="food" level={foodLevel} upgradeLevel={foodTroughLevel} onFill={onFillFeed} foodType={'mixed'} cornCount={cornCount} carrotCount={carrotCount} onToggleFoodType={onToggleFoodType} />
             <Trough label={`Water ${waterTroughLevel}`} type="water" level={waterLevel} upgradeLevel={waterTroughLevel} onFill={onFillWater} />
           </div>
         </div>

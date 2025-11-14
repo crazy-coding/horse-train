@@ -25,8 +25,8 @@ async function buildManifest(){
       }
     }
 
-    await fs.writeFile(outFile, JSON.stringify(manifest, null, 2), 'utf8')
-    console.log('Wrote asset manifest to', outFile)
+  await fs.writeFile(outFile, JSON.stringify(manifest, null, 2), 'utf8')
+  // manifest written
   }catch(err){
     console.error('Error building asset manifest', err)
     process.exit(1)
